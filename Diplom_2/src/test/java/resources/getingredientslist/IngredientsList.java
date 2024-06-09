@@ -12,30 +12,24 @@ public class IngredientsList {
     public int random4Numbers () {
         return new Random().nextInt(8999)+1000;
     }
-    CheckResponse newCheckResponse = new CheckResponse();
-    DeleteUser deleteUser = new DeleteUser();
 
     @Step("Обновление списка ингредиентов")
     public String[] updateIngredientList () {
 
         RestAssured.baseURI = Constants.BASE_URL;
 
-        //создание пользователя
         String email = random4Numbers() + Constants.DEFAULT_EMAIL;
         String password = Constants.DEFAULT_PASSWORD;
         String name = Constants.DEFAULT_NAME;
 
-        CreateUser newCreatedUser = new CreateUser(email, password, name);
-        newCreatedUser.createUserRequest(newCreatedUser);
+        //создание пользователя
+        new CreateUser().createUser(email, password, name);
 
         //логин пользователя
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
-        newCheckResponse.checkStatusCode(responseLoginUser, Constants.STATUS_CODE_200);
-        newCheckResponse.checkBodyMessage(responseLoginUser, Constants.KEY_NAME_SUCCESS, true);
+        LoginUser newLogin = new LoginUser().loginUserRequest(email, password);
 
         //получение токена
-        String accessToken = newLoginUser.getLoginUserAccessToken(responseLoginUser);
+        String accessToken = newLogin.getLoginUserAccessToken();
 
         //отправка запроса GET для получения списка ингредиентов
         GetIngredientsList getList =  new GetIngredientsList();
@@ -48,7 +42,7 @@ public class IngredientsList {
         };
 
         //удаление созданного пользователя
-        deleteUser.deleteUserRequest(accessToken);
+        new DeleteUser().deleteUserRequest(accessToken);
 
         return freshIngredientList;
     }

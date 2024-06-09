@@ -10,13 +10,12 @@ import resources.*;
 
 import java.util.Random;
 
+@DisplayName("Создание заказа")
 public class CreateOrderTest {
 
     public int random4Numbers () {
         return new Random().nextInt(8999)+1000;
     }
-    CheckResponse newCheckResponse = new CheckResponse();
-    DeleteUser deleteUser = new DeleteUser();
 
     @Before
     public void setUp() {
@@ -29,31 +28,27 @@ public class CreateOrderTest {
     @Description("Создание заказа c авторизацией и наличием ингредиентов")
     public void createOrder () {
 
-        //создание пользователя
         String email = random4Numbers()+ Constants.DEFAULT_EMAIL;
         String password = Constants.DEFAULT_PASSWORD;
         String name = Constants.DEFAULT_NAME;
 
-        CreateUser newCreatedUser = new CreateUser(email, password, name);
-        newCreatedUser.createUserRequest(newCreatedUser);
+        //создание пользователя
+        new CreateUser().createUser(email, password, name);
 
         //логин пользователя
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
+        LoginUser newLogin = new LoginUser().loginUserRequest(email, password);
 
         //получение токена
-        String accessToken = newLoginUser.getLoginUserAccessToken(responseLoginUser);
+        String accessToken = newLogin.getLoginUserAccessToken();
 
-        //создание заказа
-        CreateOrder newOrder = new CreateOrder(Constants.INGREDIENT_LIST);
-        Response responseCreateOrder = newOrder.createOrderRequest(newOrder,accessToken);
-
-        //проверка статус кода и тела запроса
-        newCheckResponse.checkStatusCode(responseCreateOrder,Constants.STATUS_CODE_200);
-        newCheckResponse.checkBodyMessage(responseCreateOrder,Constants.KEY_NAME_SUCCESS,true);
+        //создание заказа, проверка статус кода и тела запроса
+        new CreateOrder(Constants.INGREDIENT_LIST)
+                .createOrderRequest(accessToken)
+                .checkStatusCode(Constants.STATUS_CODE_200)
+                .checkBodyMessage(Constants.KEY_NAME_SUCCESS,true);
 
         //удаление созданного пользователя
-        deleteUser.deleteUserRequest(accessToken);
+        new DeleteUser().deleteUserRequest(accessToken);
     }
 
     @Test
@@ -61,31 +56,27 @@ public class CreateOrderTest {
     @Description("Попытка создания заказа c авторизацией и без ингредиентов")
     public void createOrderWithoutIngredients () {
 
-        //создание пользователя
         String email = random4Numbers()+ Constants.DEFAULT_EMAIL;
         String password = Constants.DEFAULT_PASSWORD;
         String name = Constants.DEFAULT_NAME;
 
-        CreateUser newCreatedUser = new CreateUser(email, password, name);
-        newCreatedUser.createUserRequest(newCreatedUser);
+        //создание пользователя
+        new CreateUser().createUser(email, password, name);
 
         //логин пользователя
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
+        LoginUser newLogin = new LoginUser().loginUserRequest(email, password);
 
         //получение токена
-        String accessToken = newLoginUser.getLoginUserAccessToken(responseLoginUser);
+        String accessToken = newLogin.getLoginUserAccessToken();
 
-        //создание заказа
-        CreateOrder newOrder = new CreateOrder(null);
-        Response responseCreateOrder = newOrder.createOrderRequest(newOrder,accessToken);
-
-        //проверка статус кода и тела запроса
-        newCheckResponse.checkStatusCode(responseCreateOrder,Constants.STATUS_CODE_400);
-        newCheckResponse.checkBodyMessage(responseCreateOrder,Constants.KEY_NAME_SUCCESS,false);
+        //создание заказа, проверка статус кода и тела запроса
+        new CreateOrder()
+                .createOrderRequest(accessToken)
+                .checkStatusCode(Constants.STATUS_CODE_400)
+                .checkBodyMessage(Constants.KEY_NAME_SUCCESS,false);
 
         //удаление созданного пользователя
-        deleteUser.deleteUserRequest(accessToken);
+        new DeleteUser().deleteUserRequest(accessToken);
     }
 
     @Test
@@ -93,30 +84,26 @@ public class CreateOrderTest {
     @Description("Попытка создания заказа c авторизацией и с неверным хешем ингредиентов")
     public void createOrderWithInvalidIngredientList () {
 
-        //создание пользователя
         String email = random4Numbers()+ Constants.DEFAULT_EMAIL;
         String password = Constants.DEFAULT_PASSWORD;
         String name = Constants.DEFAULT_NAME;
 
-        CreateUser newCreatedUser = new CreateUser(email, password, name);
-        newCreatedUser.createUserRequest(newCreatedUser);
+        //создание пользователя
+        new CreateUser().createUser(email, password, name);
 
         //логин пользователя
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
+        LoginUser newLogin = new LoginUser().loginUserRequest(email, password);
 
         //получение токена
-        String accessToken = newLoginUser.getLoginUserAccessToken(responseLoginUser);
+        String accessToken = newLogin.getLoginUserAccessToken();
 
-        //создание заказа
-        CreateOrder newOrder = new CreateOrder(Constants.INVALID_INGREDIENT_LIST);
-        Response responseCreateOrder = newOrder.createOrderRequest(newOrder,accessToken);
-
-        //проверка статус кода
-        newCheckResponse.checkStatusCode(responseCreateOrder,Constants.STATUS_CODE_500);
+        //создание заказа, проверка статус кода
+        new CreateOrder(Constants.INVALID_INGREDIENT_LIST)
+                .createOrderRequest(accessToken)
+                .checkStatusCode(Constants.STATUS_CODE_500);
 
         //удаление созданного пользователя
-        deleteUser.deleteUserRequest(accessToken);
+        new DeleteUser().deleteUserRequest(accessToken);
     }
 
     @Test
@@ -124,13 +111,11 @@ public class CreateOrderTest {
     @Description("Создание заказа без авторизации")
     public void createOrderWithoutAuth () {
 
-        //создание заказа
-        CreateOrder newOrder = new CreateOrder(Constants.INGREDIENT_LIST);
-        Response responseCreateOrder = newOrder.createOrderRequest(newOrder);
-
-        //проверка статус кода
-        newCheckResponse.checkStatusCode(responseCreateOrder,Constants.STATUS_CODE_200);
-        newCheckResponse.checkBodyMessage(responseCreateOrder,Constants.KEY_NAME_SUCCESS,true);
+        //создание заказа, проверка статус кода и тела запроса
+        new CreateOrder(Constants.INGREDIENT_LIST)
+                .createOrderRequest()
+                .checkStatusCode(Constants.STATUS_CODE_200)
+                .checkBodyMessage(Constants.KEY_NAME_SUCCESS,true);
     }
 
 }

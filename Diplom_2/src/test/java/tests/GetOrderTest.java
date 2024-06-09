@@ -3,19 +3,16 @@ package tests;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Test;
 import resources.*;
 
 import java.util.Random;
-
+@DisplayName("Получение заказов пользователя")
 public class GetOrderTest {
     public int random4Numbers () {
         return new Random().nextInt(8999)+1000;
     }
-    CheckResponse newCheckResponse = new CheckResponse();
-    DeleteUser deleteUser = new DeleteUser();
 
     @Before
     public void setUp() {
@@ -32,30 +29,26 @@ public class GetOrderTest {
         String password = Constants.DEFAULT_PASSWORD;
         String name = Constants.DEFAULT_NAME;
 
-        CreateUser newCreatedUser = new CreateUser(email, password, name);
-        newCreatedUser.createUserRequest(newCreatedUser);
+        //создание пользователя
+        new CreateUser().createUser(email, password, name);
 
         //логин пользователя
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
+        LoginUser newLogin = new LoginUser().loginUserRequest(email, password);
 
         //получение токена
-        String accessToken = newLoginUser.getLoginUserAccessToken(responseLoginUser);
+        String accessToken = newLogin.getLoginUserAccessToken();
 
         //создание заказа
-        CreateOrder newOrder = new CreateOrder(Constants.INGREDIENT_LIST);
-        newOrder.createOrderRequest(newOrder,accessToken);
+        new CreateOrder(Constants.INGREDIENT_LIST)
+                .createOrderRequest(accessToken);
 
         //получение списка заказов пользователя
-        GetOrders newOrderList = new GetOrders();
-        Response responseOrderList = newOrderList.getOrderRequest(accessToken);
-
-        //проверка статус кода и тела запроса
-        newCheckResponse.checkStatusCode(responseOrderList,Constants.STATUS_CODE_200);
-        newCheckResponse.checkBodyMessage(responseOrderList,Constants.KEY_NAME_SUCCESS,true);
+        new GetOrders().getOrderRequest2(accessToken)
+                .checkStatusCode(Constants.STATUS_CODE_200)
+                .checkBodyMessage(Constants.KEY_NAME_SUCCESS,true);
 
         //удаление созданного пользователя
-        deleteUser.deleteUserRequest(accessToken);
+        new DeleteUser().deleteUserRequest(accessToken);
 
     }
     @Test
@@ -64,18 +57,13 @@ public class GetOrderTest {
     public void getOrderWithoutAuth () {
 
         //создание заказа
-        CreateOrder newOrder = new CreateOrder(Constants.INGREDIENT_LIST);
-        newOrder.createOrderRequest(newOrder);
+        new CreateOrder(Constants.INGREDIENT_LIST)
+                .createOrderRequest();
 
         //получение списка заказов пользователя
-        GetOrders newOrderList = new GetOrders();
-        Response responseOrderList = newOrderList.getOrderRequest();
-
-        //проверка статус кода и тела запроса
-        newCheckResponse.checkStatusCode(responseOrderList,Constants.STATUS_CODE_401);
-        newCheckResponse.checkBodyMessage(responseOrderList,Constants.KEY_NAME_SUCCESS,false);
+        new GetOrders().getOrderRequest2()
+                .checkStatusCode(Constants.STATUS_CODE_401)
+                .checkBodyMessage(Constants.KEY_NAME_SUCCESS,false);
 
     }
-
-
 }

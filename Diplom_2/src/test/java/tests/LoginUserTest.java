@@ -9,13 +9,11 @@ import org.junit.Test;
 import resources.*;
 
 import java.util.Random;
-
+@DisplayName("Логин пользователя")
 public class LoginUserTest {
     public int random4Numbers () {
         return new Random().nextInt(8999)+1000;
     }
-    CheckResponse newCheckResponse = new CheckResponse();
-    DeleteUser deleteUser = new DeleteUser();
 
     @Before
     public void setUp() {
@@ -32,17 +30,15 @@ public class LoginUserTest {
         String name = Constants.DEFAULT_NAME;
 
         //создание пользователя
-        CreateUser newCreatedUser = new CreateUser(email, password, name);
-        newCreatedUser.createUserRequest(newCreatedUser);
+        CreateUser newUser = new CreateUser().createUser(email, password, name);
 
-        //логин пользователя
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
-        newCheckResponse.checkStatusCode(responseLoginUser, Constants.STATUS_CODE_200);
-        newCheckResponse.checkBodyMessage(responseLoginUser, Constants.KEY_NAME_SUCCESS, true);
+        //логин пользователя, проверка кода и тела ответа
+        LoginUser newLogin = new LoginUser().loginUserRequest(email, password)
+                .checkStatusCode(Constants.STATUS_CODE_200)
+                .checkBodyMessage(Constants.KEY_NAME_SUCCESS, true);
 
         //удаление созданного пользователя
-        deleteUser.deleteUserRequest(responseLoginUser);
+        new DeleteUser().deleteUserRequest(newLogin.getLoginUserAccessToken());
 }
 
     @Test
@@ -53,11 +49,10 @@ public class LoginUserTest {
         String email = random4Numbers()+ Constants.DEFAULT_EMAIL;
         String password = Constants.DEFAULT_PASSWORD;
 
-        //логин пользователя
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
-        newCheckResponse.checkStatusCode(responseLoginUser, Constants.STATUS_CODE_401);
-        newCheckResponse.checkBodyMessage(responseLoginUser, Constants.KEY_NAME_SUCCESS, false);
+        //логин пользователя, проверка кода и тела ответа
+        LoginUser newLogin = new LoginUser().loginUserRequest(email, password)
+                .checkStatusCode(Constants.STATUS_CODE_401)
+                .checkBodyMessage(Constants.KEY_NAME_SUCCESS, false);
 
     }
 

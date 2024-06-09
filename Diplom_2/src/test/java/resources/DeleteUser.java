@@ -9,14 +9,9 @@ public class DeleteUser {
 
     @Step("Отправка Delete запроса для удаления пользователя")
     public void deleteUserRequest(String email, String password) {
-        LoginUser newLoginUser = new LoginUser(email, password);
-        Response responseLoginUser = newLoginUser.loginUserRequest(newLoginUser);
-        deleteUserRequest(responseLoginUser);
-    }
-
-    @Step("Отправка Delete запроса для удаления пользователя")
-    public void deleteUserRequest(Response responseLoginUser) {
-        String accessToken = new LoginUser().getLoginUserAccessToken(responseLoginUser);
+        String accessToken = new LoginUser()
+                .loginUserRequest(email, password)
+                .getLoginUserAccessToken();
         deleteUserRequest(accessToken);
     }
 

@@ -7,6 +7,10 @@ import static io.restassured.RestAssured.given;
 
 public class CreateOrder {
     private String[] ingredients;
+    private Response response;
+    public Response getResponse() {
+        return response;
+    }
 
     public CreateOrder() {
     }
@@ -15,22 +19,37 @@ public class CreateOrder {
     }
 
     @Step("Отправка POST запроса для Создания заказ")
-    public Response createOrderRequest(CreateOrder newCreateOrder, String accessToken) {
-        return given()
+    public CreateOrder createOrderRequest(String accessToken) {
+        CreateOrder newCreateOrder = new CreateOrder(ingredients);
+        response = given()
                 .header("Content-type", "application/json")
                 .header("Authorization", accessToken)
                 .body(newCreateOrder)
                 .post(Constants.CREATE_ORDER_ENDPOINT);
+        return this;
     }
 
     @Step("Отправка POST запроса для Создания заказ")
     //запрос без авторизации (accessToken отсутствует)
-    public Response createOrderRequest(CreateOrder newCreateOrder) {
-        return given()
+    public CreateOrder createOrderRequest() {
+        CreateOrder newCreateOrder = new CreateOrder(ingredients);
+        response = given()
                 .header("Content-type", "application/json")
                 .body(newCreateOrder)
                 .post(Constants.CREATE_ORDER_ENDPOINT);
+        return this;
     }
-
+    @Step("Проверка статус-кода")
+    //запрос с авторизацией
+    public CreateOrder checkStatusCode(int statusCode) {
+        new CheckResponse().checkStatusCode(response, statusCode);
+        return this;
+    }
+    @Step("Проверка тела ответа")
+    //запрос с авторизацией
+    public CreateOrder checkBodyMessage(String keyName, boolean expectedMessage) {
+        new CheckResponse().checkBodyMessage(response, keyName, expectedMessage);
+        return this;
+    }
 
 }
