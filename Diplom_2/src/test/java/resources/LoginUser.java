@@ -23,21 +23,6 @@ public class LoginUser {
     public LoginUser() {
     }
 
-//    @Step("Отправка POST запроса для Авторизации пользователя")
-//    public Response loginUserRequest(LoginUser newLoginUser) {
-//        return given()
-//                .header("Content-type", "application/json")
-//                .body(newLoginUser)
-//                .post(Constants.LOGIN_USER_ENDPOINT);
-//    }
-//
-//    @Step("Получение AccessToken залогиненного пользователя")
-//    public String getLoginUserAccessToken(Response responseLoginUser) {
-//        LoginUserDeserialization loggedUser = responseLoginUser.as(LoginUserDeserialization.class);
-//        return loggedUser.getAccessToken();
-//    }
-
-
     @Step("Отправка POST запроса для Авторизации пользователя")
     public LoginUser loginUserRequest(String email, String password) {
         LoginUser newLoginUser = new LoginUser(email, password);

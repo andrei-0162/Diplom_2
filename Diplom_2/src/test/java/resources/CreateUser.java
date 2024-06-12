@@ -35,14 +35,6 @@ public class CreateUser {
         return this;
     }
 
-//    @Step("Отправка POST запроса для Создания пользователя")
-//    public Response createUser(CreateUser newCreatedUser ) {
-//        return given()
-//                .header("Content-type", "application/json")
-//                .body(newCreatedUser)
-//                .post(Constants.CREATE_USER_ENDPOINT);
-//    }
-
     @Step("Проверка статус-кода")
     //запрос с авторизацией
     public CreateUser checkStatusCode(int statusCode) {

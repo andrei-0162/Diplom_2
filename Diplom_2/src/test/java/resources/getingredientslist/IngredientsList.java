@@ -2,7 +2,6 @@ package resources.getingredientslist;
 
 import io.qameta.allure.Step;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
 import resources.*;
 import java.util.*;
 
